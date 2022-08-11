@@ -1,7 +1,7 @@
 FROM php:8.0.16-apache
 
 ENV TZ Asia/Tokyo
-ENV APACHE_DOCUMENT_ROOT //app/htdocs
+ENV APACHE_DOCUMENT_ROOT /docker_php_batch/app/htdocs
 
 RUN mkdir /docker_php_batch
 WORKDIR /docker_php_batch
