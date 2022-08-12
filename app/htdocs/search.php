@@ -13,7 +13,56 @@ $nameKana = '';
 $gender = '';
 $whereSql = '';
 $param = [];
+$errorMessage = '';
+$successMessage = '';
 
+//POST送信かつ削除ボタン押下
+if (mb_strtolower($_SERVER['REQUEST_METHOD']) == 'post') { //同じpostでも大文字のPOSTが送信されるときがあるので小文字変換比較
+    //trueならば削除ボタンが押されたということ
+    $isDelete = (isset($_POST['delete']) && $_POST['delete'] === '1') ? true : false;
+
+    if ($isDelete === true) {
+        //POSTされた社員番号の入力チェック
+        $deleteId = isset($_POST['id']) ? $_POST['id'] : '';
+        if ($deleteId === '') { //空白ではないか
+            $errorMessage .= '社員番号が不正です。<br>';
+        } elseif (!preg_match('/\A[0-9]{6}\z/', $deleteId)) { //6桁の数値か
+            $errorMessage .= '社員番号が不正です。<br>';
+        } else {
+            //存在する社員番号か
+            $sql = "SELECT COUNT(*) AS count FROM users WHERE id = :id";
+            $param = array("id" => $deleteId);
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($param);
+            $count = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($count['count'] === '0') {
+                $errorMessage .= '社員番号が不正です。<br>';
+            }
+        }
+
+        //入力チェックOK?
+        if ($errorMessage === '') {
+            //トランザクション開始
+            $pdo->beginTransaction();
+
+            //社員情報の削除
+            $sql = "DELETE FROM users WHERE id = :id";
+            $param = array("id" => $deleteId);
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute($param);
+
+            //コミット
+            $pdo->commit();
+
+            $successMessage = '削除が完了しました。';
+        } else {
+            //エラー有り
+            echo $errorMessage;
+        }
+    }
+}
+
+$param = [];
 //検索条件が指定されている
 if (isset($_GET['id']) && isset($_GET['name_kana'])) {
     $id = $_GET['id'];
@@ -113,6 +162,16 @@ $stmt->execute($param);
                 </form>
             </div>
 
+            <?php //エラーメッセージを表示 ?>
+            <?php if ($errorMessage !== '') { ?>
+                <p class="error_message"><?php echo $errorMessage; ?></p>
+            <?php } ?>
+
+            <?php //完了メッセージを表示 ?>
+            <?php if ($successMessage !== '') { ?>
+                <p class="success_message"><?php echo $successMessage; ?></p>
+            <?php } ?>
+
             <?php //件数表示 ?>
             <div id="page_area">
                 <div id="page_count"><?php echo htmlspecialchars($count['count']); ?>件ヒットしました</div>
@@ -148,7 +207,7 @@ $stmt->execute($param);
                                     <td><?php echo htmlspecialchars($row['mail_address']); ?></td>
                                     <td class="button_area">
                                     <button class="edit_button">編集</button>
-                                    <button class="delete_button">削除</button>
+                                    <button class="delete_button" onclick="deleteUser(<?php echo htmlspecialchars($row['id']); ?>);">削除</button>
                                     </td>
                                 </tr>
                             <?php } ?>
@@ -159,5 +218,24 @@ $stmt->execute($param);
         </div>
     </div>
 </div>
+
+<form action="search.php" name="delete_form" method="POSt">
+    <input type="hidden" name="id" value="" />
+    <input type="hidden" name="delete" value="1">
+</form>
+
+<script>
+//JavaScriptでform内のhidden項目[id]に社員情報をセットしてsubmitする
+function deleteUser(id) {
+    //削除確認ダイアログ表示
+    if (!window.confirm(`社員番号${id}を削除してもよろしいですか？`)) {
+        //キャンセルが押されたら処理終了
+        return false;
+    }
+    //OKが押されたら社員番号をhidden項目[id]に社員番号をセットしてsubmit
+    document.delete_form.id.value = id;
+    document.delete_form.submit();
+}
+</script>
 </body>
 </html>
