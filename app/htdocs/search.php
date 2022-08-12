@@ -90,11 +90,11 @@ $stmt->execute($param);
                         <div class="clearfix">
                             <div class="input_area">
                                 <span class="input_label">社員番号(完全一致)</span>
-                                <input type="text" name="id" value="<?php echo $id; ?>" />
+                                <input type="text" name="id" value="<?php echo htmlspecialchars($id); ?>" />
                             </div>
                             <div class="input_area">
                                 <span class="input_label">社員名カナ(前方一致)</span>
-                                <input type="text" name="name_kana" value="<?php echo $nameKana; ?>" />
+                                <input type="text" name="name_kana" value="<?php echo htmlspecialchars($nameKana); ?>" />
                             </div>
                             <div class="input_area"><span class="input_label">性別</span>
                                 <input type="radio" name="gender" value="男性" id="gender_male" <?php echo $gender === "男性" ? "checked" : ""; ?> >
@@ -115,7 +115,7 @@ $stmt->execute($param);
 
             <?php //件数表示 ?>
             <div id="page_area">
-                <div id="page_count"><?php echo $count['count']; ?>件ヒットしました</div>
+                <div id="page_count"><?php echo htmlspecialchars($count['count']); ?>件ヒットしました</div>
             </div>
 
             <div id="search_result">
@@ -139,13 +139,13 @@ $stmt->execute($param);
                             <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) { ?>
                                 <tr>
                                     <?php //社員情報の表示 ?>
-                                    <td><?php echo $row['id']; ?></td>
-                                    <td><?php echo $row['name']; ?>(<?php echo $row["name_kana"]; ?>)</td>
-                                    <td><?php echo $row['gender']; ?></td>
-                                    <td><?php echo $row['organization']; ?></td>
-                                    <td><?php echo $row['post']; ?></td>
-                                    <td><?php echo $row['tel']; ?></td>
-                                    <td><?php echo $row['mail_address']; ?></td>
+                                    <td><?php echo htmlspecialchars($row['id']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['name']); ?>(<?php echo htmlspecialchars($row["name_kana"]); ?>)</td>
+                                    <td><?php echo htmlspecialchars($row['gender']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['organization']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['post']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['tel']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['mail_address']); ?></td>
                                     <td class="button_area">
                                     <button class="edit_button">編集</button>
                                     <button class="delete_button">削除</button>
