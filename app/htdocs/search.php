@@ -1,10 +1,7 @@
 <?php
 declare(strict_types=1); // 厳格な型チェックをする
 
-require_once(dirname(__DIR__) . '/config/config.php');
-require_once(dirname(__DIR__) . '/library/validate.php');
-require_once(dirname(__DIR__) . '/library/database.php');
-require_once(dirname(__DIR__) . '/library/users.php');
+require_once(dirname(__DIR__) . '/library/common.php');
 
 $id = '';
 $nameKana = '';
@@ -66,5 +63,5 @@ $count = Users::searchCount($id, $nameKana, $gender);
 $data = Users::searchData($id, $nameKana, $gender);
 
 $title = '社員検索';
-require_once(dirname(__DIR__) . "/template/search.php");
+require_once(TEMPLATE_DIR . 'search.php');
 ?>
