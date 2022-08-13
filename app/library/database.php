@@ -72,9 +72,9 @@ class DataBase
      *
      * @param string $sql 実行SQL
      * @param array $param 実行SQLに渡すパラメータ
-     * @return array SQL実行結果配列
+     * @return array | bool SQL実行結果配列
      */
-    public static function fetch(string $sql, array $param = []): array
+    public static function fetch(string $sql, array $param = []): array | bool
     {
         $stmt = self::getInstance()->prepare($sql);
         $stmt->execute($param);

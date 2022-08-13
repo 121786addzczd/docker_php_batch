@@ -10,5 +10,19 @@
 <body>
 
 <div id="header">
-    <h1>社員管理システム</h1>
+  <h1>
+    <div class="clearfix">
+      <div class="f1">
+        社員管理システム
+      </div>
+      <?php if (isset($_SESSION['name'])) { ?>
+        <div class="fr">
+          <span class="font14">
+            <?php echo "ようこそ" . htmlspecialchars($_SESSION['name']) . " さん"; ?>
+            <a class="text_red" href="logout.php">ログアウト</a>
+          </span>
+        </div>
+      <?php } ?>
+    </div>
+  </h1>
 </div>
