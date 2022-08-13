@@ -2,6 +2,7 @@
 declare(strict_types=1); // 厳格な型チェックをする
 
 require_once(dirname(__DIR__) . '/config/config.php');
+require_once(dirname(__DIR__) . '/library/validate.php');
 
 //データべース接続
 $pdo = new PDO(
@@ -25,9 +26,9 @@ if (mb_strtolower($_SERVER['REQUEST_METHOD']) == 'post') { //同じpostでも大
     if ($isDelete === true) {
         //POSTされた社員番号の入力チェック
         $deleteId = isset($_POST['id']) ? $_POST['id'] : '';
-        if ($deleteId === '') { //空白ではないか
+        if (!validateRequired($deleteId)) { //空白ではないか
             $errorMessage .= '社員番号が不正です。<br>';
-        } elseif (!preg_match('/\A[0-9]{6}\z/', $deleteId)) { //6桁の数値か
+        } elseif (!validateId($deleteId)) { //6桁の数値か
             $errorMessage .= '社員番号が不正です。<br>';
         } else {
             //存在する社員番号か
