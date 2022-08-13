@@ -19,7 +19,7 @@
         <div class="fr">
           <span class="font14">
             <?php echo "ようこそ" . htmlspecialchars($_SESSION['name']) . " さん"; ?>
-            <a class="text_red" href="">ログアウト</a>
+            <a class="text_red" href="logout.php">ログアウト</a>
           </span>
         </div>
       <?php } ?>
