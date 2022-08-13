@@ -3,12 +3,7 @@ declare(strict_types=1); // 厳格な型チェックをする
 
 require_once(dirname(__DIR__) . '/config/config.php');
 require_once(dirname(__DIR__) . '/library/validate.php');
-
-//データべース接続
-$pdo = new PDO(
-    "mysql:host=" . DB_HOST . ";dbname=". DB_NAME . ";charset=utf8",
-    DB_USER, DB_PASS
-);
+require_once(dirname(__DIR__) . '/library/database.php');
 
 $id = '';
 $nameKana = '';
@@ -34,9 +29,7 @@ if (mb_strtolower($_SERVER['REQUEST_METHOD']) == 'post') { //同じpostでも大
             //存在する社員番号か
             $sql = "SELECT COUNT(*) AS count FROM users WHERE id = :id";
             $param = array("id" => $deleteId);
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute($param);
-            $count = $stmt->fetch(PDO::FETCH_ASSOC);
+            $count = DataBase::fetch($sql, $param);
             if ($count['count'] === '0') {
                 $errorMessage .= '社員番号が不正です。<br>';
             }
@@ -45,16 +38,15 @@ if (mb_strtolower($_SERVER['REQUEST_METHOD']) == 'post') { //同じpostでも大
         //入力チェックOK?
         if ($errorMessage === '') {
             //トランザクション開始
-            $pdo->beginTransaction();
+            DataBase::beginTransaction();
 
             //社員情報の削除
             $sql = "DELETE FROM users WHERE id = :id";
             $param = array("id" => $deleteId);
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute($param);
+            DataBase::execute($sql, $param);
 
             //コミット
-            $pdo->commit();
+            DataBase::commit();
 
             $successMessage = '削除が完了しました。';
         } else {
@@ -96,15 +88,12 @@ if (isset($_GET['id']) && isset($_GET['name_kana'])) {
 //件数取得SQLの実行
 $sql = "SELECT COUNT(*) AS count FROM users WHERE 1 = 1 {$whereSql}";
 // $param = [];
-$stmt = $pdo->prepare($sql);
-$stmt->execute($param);
-$count = $stmt->fetch(PDO::FETCH_ASSOC);
+$count = DataBase::fetch($sql, $param);
 // var_dump($count);
 
 //社員情報取得SQLの実行
 $sql = "SELECT * FROM users WHERE 1 = 1 {$whereSql} ORDER BY id";
-$stmt = $pdo->prepare($sql);
-$stmt->execute($param);
+$data = DataBase::fetchAll($sql, $param);
 // while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 //     var_dump($row);
 // }

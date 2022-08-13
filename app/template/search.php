@@ -70,7 +70,7 @@
                         <?php //件数が1件以上 ?>
                         <?php if ($count['count'] >= 1) { ?>
                             <?php //社員情報取得結果を1行ずつ読込、終端まで繰り返し ?>
-                            <?php while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) { ?>
+                            <?php foreach ($data as $row) { ?>
                                 <tr>
                                     <?php //社員情報の表示 ?>
                                     <td><?php echo htmlspecialchars($row['id']); ?></td>
