@@ -1,26 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$genderLists = [
-    "男性",
-    "女性",
-];
-$organizationLists = [
-    "営業部",
-    "人事部",
-    "総務部",
-    "システム開発1部",
-    "システム開発2部",
-    "システム開発3部",
-    "システム開発4部",
-    "システム開発5部",
-];
-$postLists = [
-    "部長",
-    "次長",
-    "課長",
-    "一般",
-];
+require_once(dirname(__DIR__) . '/config/config.php');
 
 //各入力項目の変数
 $id = '';
@@ -39,11 +20,10 @@ $isEdit = false;
 $isSave = false;
 
 //データベース接続
-$DB_USER = 'docker_php_batch_user';
-$DB_PASSWORD = 'docker_php_batch_pass';
-$DB_HOST = 'db';
-$DB = "docker_php_batch_db";
-$pdo = new PDO("mysql:host={$DB_HOST};dbname={$DB};charset=utf8", $DB_USER, $DB_PASSWORD);
+$pdo = new PDO(
+    "mysql:host=" . DB_HOST . ";dbname=". DB_NAME . ";charset=utf8",
+    DB_USER, DB_PASS
+);
 
 //POST通信、かつ登録ボタン押下
 if (mb_strtolower($_SERVER['REQUEST_METHOD']) === 'post') {
@@ -104,35 +84,8 @@ if (mb_strtolower($_SERVER['REQUEST_METHOD']) === 'post') {
             $mailAddress = $user['mail_address'];
         } else {
             //エラー画面表示
-?>
-<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>エラー</title>
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-<link rel="stylesheet" type="text/css" href="/css/style.css" />
-</head>
-<body>
-
-<div id="header">
-  <h1>社員管理システム</h1>
-</div>
-
-<div class="clearfix">
-  <div id="menu">
-    <h3>メニュー</h3>
-    <div class="sub_menu"><a href="./search.php">社員検索</a></div>
-    <div class="sub_menu"><a href="./input.php">社員登録</a></div>
-  </div>
-
-  <div id="main">
-    <div class="error_message"><?php echo $errorMessage; ?></div>
-  </div>
-</div>
-</body>
-</html>
-<?php
+            $title = 'エラー';
+            require_once(dirname(__DIR__) . "/template/error.php");
             exit; //処理終了
         }
     }
@@ -193,7 +146,7 @@ if (mb_strtolower($_SERVER['REQUEST_METHOD']) === 'post') {
         //POSTされた性別の入力チェック
         //以下のいずれかか
         //男性、女性
-        if (!in_array($gender, $genderLists)) {
+        if (!in_array($gender, GENDER_LISTS)) {
             $errorMessage .= '性別を選択してください。<br>';
         }
 
@@ -201,14 +154,14 @@ if (mb_strtolower($_SERVER['REQUEST_METHOD']) === 'post') {
         //以下のいずれかか
         //営業部、人事部、総務部、システム開発1部、システム開発2部、システム開発3部、
         //システム開発4部、システム開発5部
-        if (!in_array($organization, $organizationLists)) {
+        if (!in_array($organization, ORGANIZATION_LISTS)) {
             $errorMessage .= '部署を選択してください。<br>';
         }
 
         //POSTされた役職の入力チェック
         //以下のいずれかか
         //部長、次長、課長、一般
-        if (!in_array($post, $postLists)) {
+        if (!in_array($post, POST_LISTS)) {
             $errorMessage .= '役職を選択してください。<br>';
         }
 
@@ -323,135 +276,6 @@ if (mb_strtolower($_SERVER['REQUEST_METHOD']) === 'post') {
     }
 }
 
-
-
+$title = '社員登録';
+require_once(dirname(__DIR__) . "/template/input.php");
 ?>
-
-<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />  
-<title>社員登録</title>
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-<link rel="stylesheet" type="text/css" href="/css/style.css" />
-</head>
-<body>
-
-<div id="header">
-  <h1>社員管理システム</h1>
-</div>
-
-<div class="clearfix">
-  <div id="menu">
-    <h3>メニュー</h3>
-    <div class="sub_menu"><a href="./search.php">社員検索</a></div>
-    <div class="sub_menu">社員登録</div>
-  </div>
-
-  <div id="main">
-    <h3 id="title">社員登録画面</h3>
-
-    <div id="input_area">
-      <form action="input.php" method="POST">
-        <p><strong>社員情報を入力してください。全て必須です。</strong></p>
-        <?php //エラーメッセージを表示 ?>
-        <?php if ($errorMessage !== '') { ?>
-            <p class="error_message"><?php echo $errorMessage; ?></p>
-        <?php } ?>
-
-        <?php //完了メッセージを表示 ?>
-        <?php if ($successMessage !== '') { ?>
-            <p class="success_message"><?php echo $successMessage; ?></p>
-        <?php } ?>
-
-        <?php //各入力項目表示 ?>
-        <table>
-          <tbody>
-            <tr>
-              <td>社員番号</td>
-              <td>
-                <?php if ($isEdit === false) { ?>
-                <!-- 新規登録 -->
-                <input type="text" name="id" value="<?php echo htmlspecialchars($id); ?>" />
-                <?php } else { ?>
-                <!-- 更新 -->
-                <input type="text" name="id" value="<?php echo htmlspecialchars($id); ?>" disabled/>
-                <input type="hidden" name="id" value="<?php echo htmlspecialchars($id); ?>" />
-                <?php }?>
-            </td>
-            </tr>
-            <tr>
-              <td>社員名</td>
-              <td><input type="text" name="name" value="<?php echo htmlspecialchars($name); ?>" /></td>
-            </tr>
-            <tr>
-              <td>社員名カナ</td>
-              <td><input type="text" name="name_kana" value="<?php echo htmlspecialchars($nameKana); ?>" /></td>
-            </tr>
-            <tr>
-              <td>生年月日</td>
-              <td><input type="date" name="birthday" value="<?php echo htmlspecialchars($birthday); ?>" /></td>
-            </tr>
-            <tr>
-              <td>性別</td>
-              <td>
-                <?php foreach($genderLists as $value) { ?>
-                <input type="radio" name="gender" value="<?php echo $value; ?>" 
-                <?php echo $gender === $value ? "checked" : ""; ?>>
-                <?php echo $value; ?>
-                <?php } ?>
-              </td>
-            </tr>
-            <tr>
-              <td>部署</td>
-              <td>
-                <select name="organization">
-                <?php foreach($organizationLists as $value) { ?>
-                  <option value="<?php echo $value; ?>" 
-                  <?php echo $organization === $value ? "selected" : ""; ?>>
-                  <?php echo $value; ?></option>
-                <?php } ?>
-                </select>
-               </td>
-             </tr>
-            <tr>
-              <td>役職</td>
-              <td>
-                <select name="post">
-                <?php foreach($postLists as $value) { ?>
-                  <option value="<?php echo $value; ?>" 
-                  <?php echo $post === $value ? "selected" : ""; ?>>
-                  <?php echo $value; ?></option>
-                  <?php } ?>
-                </select>
-              </td>
-            </tr>
-            <tr>
-              <td>入社年月日</td>
-              <td><input type="date" name="start_date" value="<?php echo htmlspecialchars($startDate); ?>" /></td>
-            </tr>
-            <tr>
-              <td>電話番号(ハイフン無し)</td>
-              <td><input type="text" name="tel" value="<?php echo htmlspecialchars($tel); ?>" /></td>
-            </tr>
-            <tr>
-              <td>メールアドレス</td>
-              <td><input type="text" name="mail_address" value="<?php echo htmlspecialchars($mailAddress); ?>" /></td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="clearfix">
-          <div class="input_area_right">
-            <input type="hidden" name="save" value="1" />
-            <input type="hidden" name="edit" value="<?php echo $isEdit === true ? '1' : ''; ?>" />
-            <input type="submit" id="input_button" value="登録">
-            <input type="button" id="back_button" value="戻る" onclick="location.href='search.php'; return false;">
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-</body>
-</html>
