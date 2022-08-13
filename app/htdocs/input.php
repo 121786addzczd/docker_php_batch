@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 require_once(dirname(__DIR__) . '/library/common.php');
 
+session_start();
+
 //各入力項目の変数
 $id = '';
 $name = '';

@@ -4,6 +4,8 @@ declare(strict_types=1);
 // 共通部分の読み込み
 require_once(dirname(__DIR__) . '/library/common.php');
 
+session_start();
+
 $loginId = '';
 $password = '';
 $errorMessage = '';
@@ -19,12 +21,17 @@ if (mb_strtolower($_SERVER['REQUEST_METHOD']) === 'post') {
 
     //ログイン認証OK？
     if (empty($loginAccount['id'])) {
-        $errorMessage .= 'ログインID不一致';
+        $errorMessage .= 'ログインID、またはパスワードに誤りがあります。';
     } elseif (password_verify($password, $loginAccount['password']) === false) {
-        $errorMessage .= 'パスワード不一致';
+        $errorMessage .= 'ログインID、またはパスワードに誤りがあります。';
     }
     if ($errorMessage === '') {
-        echo 'ログイン成功';
+        session_regenerate_id(true);
+        $_SESSION['id'] = $loginAccount['id'];
+        $_SESSION['login_id'] = $loginAccount['login_id'];
+        $_SESSION['name'] = $loginAccount['name'];
+        header('Location: search.php');
+        exit;
     }
 
     //ログイン処理

@@ -3,6 +3,8 @@ declare(strict_types=1); // 厳格な型チェックをする
 
 require_once(dirname(__DIR__) . '/library/common.php');
 
+session_start();
+
 $id = '';
 $nameKana = '';
 $gender = '';
