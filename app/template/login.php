@@ -27,5 +27,6 @@
       </div>
     </form>
   </div>
+  <a href="sign_up.php">アカウントをお持ちではない方はこちら</a>
 </div>
 <?php require_once(TEMPLATE_DIR . "footer.php"); ?>
